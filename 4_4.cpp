@@ -1,77 +1,70 @@
-#include <cstring>
 #include <iostream>
-#include <string>
-
-using namespace std;
+#include <cstring>
 
 class String {
 private:
-    char* value;
-    int length;
+    char* m_data;
+    std::size_t m_size;
+
 public:
-    String()
-    {
-        value = new char[1];
-        length = 0;
-        value[0] = '\0';
+    // Конструктор по умолчанию
+    String() : m_data(new char[1]), m_size(0) {
+        m_data[0] = '\0';
     }
 
-    String(string str)
-    {
-        length = str.length();
-        value = new char[length + 1];
-        for (int i = 0; i <= length; i++) {
-            value[i] = str[i];
-        }
+    // Конструктор копирования
+    String(const String& other) : m_data(new char[other.m_size + 1]), m_size(other.m_size) {
+        std::strcpy(m_data, other.m_data);
     }
 
-    String(const String& s)
-    {
-        length = s.length;
-        value = new char[length + 1];
-        for (int i = 0; i <= length; i++) {
-            value[i] = s.value[i];
-        }
+    // Конструктор инициализации Си-строкой
+    String(const char* data) : m_data(new char[std::strlen(data) + 1]), m_size(std::strlen(data)) {
+        std::strcpy(m_data, data);
     }
 
-    void setValue(char* newValue)
-    {
-        delete[] value;
-        length = strlen(newValue);
-        value = new char[length + 1];
-        strcpy(value, newValue);
+    // Деструктор
+    ~String() {
+        delete[] m_data;
     }
 
-    friend ostream& operator<<(ostream& outputStream, const String& s);
-    friend istream& operator>>(istream& inputStream, String& s);
+    // Перегрузка оператора <<
+    friend std::ostream& operator<<(std::ostream& os, const String& str) {
+        return os << str.m_data;
+    }
 
-    ~String()
-    {
-        delete[] value;
+    // Перегрузка оператора >>
+    friend std::istream& operator>>(std::istream& is, String& str) {
+        const int max_input_length = 4096;
+        char buffer[max_input_length];
+        is.getline(buffer, max_input_length);
+        str = String(buffer);
+        return is;
+    }
+
+    // Методы для работы со строками
+    std::size_t size() const {
+        return m_size;
+    }
+
+    const char* c_str() const {
+        return m_data;
     }
 };
 
-ostream& operator<<(ostream& outputStream, const String& s)
-{
-    return outputStream << s.value;
-}
+int main() {
+    String s1; // Пустая строка
+    std::cout << "Enter s1: ";
+    std::cin >> s1;
+    std::cout << "s1: " << s1 << ", size: " << s1.size() << '\n';
 
-istream& operator>>(istream& inputStream, String& s)
-{
-    char buffer[1024];
-    inputStream >> buffer;
-    s.setValue(buffer);
-    return inputStream;
-}
+    String s2("Hello"); // Строка "Hello"
+    std::cout << "s2: " << s2 << ", size: " << s2.size() << '\n';
 
+    String s3 = s2; // Копирование s2 в s3
+    std::cout << "s3: " << s3 << ", size: " << s3.size() << '\n';
 
-int main()
-{
-    setlocale(LC_ALL, "Russian");
-    cout << "Введите строку: " << endl;
-    String str;
-    cin >> str;
-    cout << "Введенная строка: " << endl;
-    cout << str << endl;
+    String s4 = "World"; // Инициализация Си-строкой
+    std::cout << "s4: " << s4 << ", size: " << s4.size() << '\n';
+
     return 0;
 }
