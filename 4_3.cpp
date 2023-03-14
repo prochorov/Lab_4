@@ -1,57 +1,58 @@
 #include <iostream>
-#include <string>
-using namespace std;
+#include <cstring>
 
-class String
-{
+class String {
 private:
-	char* value;
-	int length; 
+    char* m_data;
+    std::size_t m_size;
+
 public:
-	String() 
-	{
-		value = new char[1];
-		length = 0;
-		value[0] = '\0';
-	}
+    // Конструктор по умолчанию
+    String() : m_data(new char[1]), m_size(0) {
+        m_data[0] = '\0';
+    }
 
-	String(string str)
-	{
-		length = str.length();
-		value = new char[length + 1];
-		for (int i = 0; i <= length; i++) {
-			value[i] = str[i];
-		}
-	}
+    // Конструктор копирования
+    String(const String& other) : m_data(new char[other.m_size + 1]), m_size(other.m_size) {
+        std::strcpy(m_data, other.m_data);
+    }
 
-	String(const String& s) 
-	{
-	length = s.length;
-	value = new char[length + 1];
-	for (int i = 0; i <= length; i++) {
-	value[i] = s.value[i];
-	}
-	}
-	friend ostream& operator<<(ostream& outputStream, const String& s); 
-		~String() 
-	{
-		delete[] value;
-	}
+    // Конструктор инициализации Си-строкой
+    String(const char* data) : m_data(new char[std::strlen(data) + 1]), m_size(std::strlen(data)) {
+        std::strcpy(m_data, data);
+    }
+
+    // Деструктор
+    ~String() {
+        delete[] m_data;
+    }
+
+    // Перегрузка оператора <<
+    friend std::ostream& operator<<(std::ostream& os, const String& str) {
+        return os << str.m_data;
+    }
+
+    // Методы для работы со строками
+    std::size_t size() const {
+        return m_size;
+    }
+
+    const char* c_str() const {
+        return m_data;
+    }
 };
-ostream& operator<<(ostream& outputStream, const String& s) 
-{
- return outputStream << s.value;
-}
+int main() {
+    String s1; // Пустая строка
+    std::cout << "s1: " << s1 << ", size: " << s1.size() << '\n';
 
+    String s2("Hello"); // Строка "Hello"
+    std::cout << "s2: " << s2 << ", size: " << s2.size() << '\n';
 
-int main(int argc, char** argv) 
-{
-	setlocale(LC_ALL, "Russian");
-	cout << "Введите строку:" << endl;
-	string example1;
-	cin >> example1;
-	String a(example1);
-	cout << "Вывод строки, инициализированный конструктором:" << endl;
-	cout << a << endl;
-	return 0;
+    String s3 = s2; // Копирование s2 в s3
+    std::cout << "s3: " << s3 << ", size: " << s3.size() << '\n';
+
+    String s4 = "World"; // Инициализация Си-строкой
+    std::cout << "s4: " << s4 << ", size: " << s4.size() << '\n';
+
+    return 0;
 }
