@@ -33,12 +33,13 @@ public:
     }
 
     // Перегрузка оператора >>
-    friend std::istream& operator>>(std::istream& is, String& str) {
-        char buffer[4096];
-        is >> buffer;
-        str = String(buffer);
-        return is;
+    ffriend std::istream& operator>>(std::istream& is, String& str) {
+    is >> str.m_data;
+    for (int i = 0; str.m_data[i] != '\0'; i++) {
+        str.m_size += 1;
     }
+    return is;
+}
 
     // Перегрузка оператора присваивания
     String& operator=(const String& other) {
