@@ -34,12 +34,13 @@ public:
 
     // Перегрузка оператора >>
     friend std::istream& operator>>(std::istream& is, String& str) {
-        const int max_input_length = 4096;
-        char buffer[max_input_length];
-        is.getline(buffer, max_input_length);
-        str = String(buffer);
-        return is;
+    is >> str.m_data;
+    for (int i = 0; str.m_data[i] != '\0'; i++) {
+        str.m_size += 1;
     }
+    return is;
+}
+
 
     // Методы для работы со строками
     std::size_t size() const {
